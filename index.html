@@ -4,109 +4,15 @@
 <head>
     <title>Text to speech</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.10.100/pdf.min.js"></script>
+    <script src="readpdf.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.entry.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.10.100/pdf.worker.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
 
     <style>
-        * {
-            box-sizing: border-box;
 
-        }
-
-        .nav {
-            background: #1A2980;
-
-            background: -webkit-linear-gradient(to right, #26D0CE, #1A2980);
-
-            background: linear-gradient(to right, #26D0CE, #1A2980);
-
-            padding-top: 20px;
-            padding-bottom: 20px;
-            color: white;
-            border-radius: 20px;
-
-
-        }
-
-        .nav span {
-            font-weight: 500;
-            font-size: 20px;
-            color: yellow;
-        }
-
-
-
-        input[type=text], input[type=file],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            resize: vertical;
-        }
-
-        label {
-            padding: 12px 12px 12px 0;
-            display: inline-block;
-        }
-
-        input[type=submit] {
-            background-color: brown;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            float: right;
-        }
-
-        input[type=submit]:hover {
-            background-color: #45a049;
-        }
-
-        .container {
-            border-radius: 5px;
-            background-color: white;
-            padding: 20px;
-            width: 50%;
-            left: 50%;
-            transform: translate(50%);
-        }
-
-        .col-25 {
-            float: left;
-            width: 25%;
-            margin-top: 6px;
-        }
-
-        .col-75 {
-            float: left;
-            width: 75%;
-            margin-top: 6px;
-        }
-
-        /* Clear floats after the columns */
-        .row:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
-        @media screen and (max-width: 800px) {
-
-            .container {
-                width: 100%;
-                left: none;
-                transform: none;
-            }
-
-            .col-25,
-            .col-75,
-            input[type=submit] {
-                width: 100%;
-                margin-top: 0;
-            }
-        }
     </style>
 </head>
 
@@ -118,74 +24,101 @@
     </center>
     <div class="container">
 
-        <div class="row">
-            <div class="col-25">
-                <label for="fname">Type file name</label>
-            </div>
-            <div class="col-75">
-                <input type="text" placeholder="Type your file name" id="name" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-25">
-                <label for="lname">Or upload file</label>
-            </div>
-            <div class="col-75">
-                <input type="file" name="inputfile" id="inputfile">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-25">
-                <label for="subject">View</label>
-            </div>
-            <div class="col-75">
-                <textarea id="firstNumber" name="subject" placeholder="Write something.." style="height:200px"></textarea>
-            </div>
-        </div>
-        <div class="row">
-          <input type="submit" value="Clear" style="float:left;" onClick="window.location.href=window.location.href">
-          <input type="submit" value="Read Text" onclick="red();myFunction('yes')">
 
+        <div class="row">
+
+            <div class="col-25">
+            </div>
+            <div class="row">
+                <div class="col-25">
+                </div>
+                <div class="col-75">
+                  <a href="upload.php"><input type="submit" value="Save to cloud" style="float:right;"></a>
+                    <label for="uploadfile">Upload file</label>
+
+
+                    <input type="radio" name="fileextention" onclick="myPdf()"> PDF
+
+                    <input type="radio" name="fileextention" onclick="myTxt()"> TXT
+
+                    <br>
+                    <input type="file" name="inputfile" id="inputfile" class="pd">
+                    <input type="file" id="file-id" name="file_name" onchange="ExtractText();">
+                    <br>
+                </div>
+            </div>
+            <div class="col-75">
+                <label for="fname">Type file name if save in cloudStorage here</label>
+                <input type="text" placeholder="Type your file name" id="name" required>
+                <br>
+                <label for="Pitch">Pitch</label>
+                <select name="pitch" id="pitch" required>
+                    <option value="1">1</option>
+                    <option value="0">0</option>
+                    <option value="2">2</option>
+                </select>
+                <br>
+                <label for="rate">Speed</label><span id="range"></span>
+                <br>
+                <input type="range" id="rate" name="rate" min="0.1" max="10" value="1" required style="width: 100%">
+                <label for="lang">Accent of language </label>
+                <select name="lang" id="lang" required>
+                    <option value="en">English</option>
+                    <option value="en-US">United States</option>
+                    <option value="cy-GB">United Kingdom</option>
+                    <option value="es">Spenish</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+            </div>
+            <div class="col-75">
+                <label for="text-view">View/Type your text here</label>
+                <textarea id="text" name="subject" placeholder="Write something.." style="height:200px"></textarea>
+            </div>
+        </div>
+        <div class="row">
+            <input type="submit" value="Clear" style="float:left;margin-top: 20px" onClick="window.location.href=window.location.href">
+            <input type="submit" value="Speech Text" onclick="read();myFunction('yes')" style="margin-top: 20px">
         </div>
 
     </div>
 
 
-
-
-
     <script>
+        //type text and read
         function myFunction(a) {
 
-            if (a == "yes") {
-                var msg = new SpeechSynthesisUtterance();
-                msg.text = document.getElementById("firstNumber").value;
-                var speach = window.speechSynthesis.speak(msg);
-                document.getElementById("red").value = msg.text
-            } else if (a == "no") {
-                return false;
-            }
+            var msg = new SpeechSynthesisUtterance();
+            var voices = window.speechSynthesis.getVoices();
+            msg.voice = voices[10];
+            msg.volume = 1; // From 0 to 1
+            //msg.rate = 0.8; // From 0.1 to 10
+            msg.rate = document.getElementById("rate").value;
+            //msg.pitch = 0; // From 0 to 2
+            msg.pitch = document.getElementById("pitch").value;
+            msg.text = document.getElementById("text").value;
+            //msg.lang = 'en-US';
+            msg.lang = document.getElementById("lang").value;
+            var speach = window.speechSynthesis.speak(msg);
+            document.getElementById("range").value = msg.text
         }
-    </script>
 
-
-    <script type="text/javascript">
+        //search file
         document.getElementById('inputfile')
             .addEventListener('change', function() {
-
                 var fr = new FileReader();
                 fr.onload = function() {
-                    document.getElementById('firstNumber')
+                    document.getElementById('text')
                         .textContent = fr.result;
                 }
 
                 fr.readAsText(this.files[0]);
             })
-    </script>
 
 
-    <script>
-        function red() {
+        function read() {
             msg = document.getElementById("name").value;
             file = "file/"
             extentsion = ".txt"
@@ -193,8 +126,9 @@
             readTextFile(vale);
         }
 
-        var fileDisplayArea = document.getElementById('firstNumber');
+        var fileDisplayArea = document.getElementById('text');
 
+        //uploade file
         function readTextFile(file) {
             var rawFile = new XMLHttpRequest();
             rawFile.open("GET", file, false);
@@ -208,7 +142,130 @@
             }
             rawFile.send(null);
         }
+
+
+        //range view
+        var slider = document.getElementById("rate");
+        var output = document.getElementById("range");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+            output.innerHTML = this.value;
+        }
     </script>
+    <script type="text/javascript">
+        function myPdf() {
+            document.getElementById("inputfile").style.display = "none"; //txt
+            document.getElementById("file-id").style.display = "inline";
+        }
+
+        function myTxt() {
+            document.getElementById("inputfile").style.display = "inline"; //txt
+            document.getElementById("file-id").style.display = "none";
+        }
+    </script>
+
+    <script>
+        var datass = '';
+        var DataArr = [];
+        PDFJS.workerSrc = '';
+
+        function ExtractText() {
+            var input = document.getElementById("file-id");
+            var fReader = new FileReader();
+            fReader.readAsDataURL(input.files[0]);
+            // console.log(input.files[0]);
+            fReader.onloadend = function(event) {
+                convertDataURIToBinary(event.target.result);
+            }
+        }
+
+        var BASE64_MARKER = ';base64,';
+
+        function convertDataURIToBinary(dataURI) {
+
+            var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+            var base64 = dataURI.substring(base64Index);
+            var raw = window.atob(base64);
+            var rawLength = raw.length;
+            var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+            for (var i = 0; i < rawLength; i++) {
+                array[i] = raw.charCodeAt(i);
+            }
+            pdfAsArray(array)
+
+        }
+
+        function getPageText(pageNum, PDFDocumentInstance) {
+            // Return a Promise that is solved once the text of the page is retrieven
+            return new Promise(function(resolve, reject) {
+                PDFDocumentInstance.getPage(pageNum).then(function(pdfPage) {
+                    // The main trick to obtain the text of the PDF page, use the getTextContent method
+                    pdfPage.getTextContent().then(function(textContent) {
+                        var textItems = textContent.items;
+                        var finalString = "";
+
+                        // Concatenate the string of the item to the final string
+                        for (var i = 0; i < textItems.length; i++) {
+                            var item = textItems[i];
+
+                            finalString += item.str + " ";
+                        }
+
+                        // Solve promise with the text retrieven from the page
+                        resolve(finalString);
+                    });
+                });
+            });
+        }
+
+        function pdfAsArray(pdfAsArray) {
+
+            PDFJS.getDocument(pdfAsArray).then(function(pdf) {
+
+                var pdfDocument = pdf;
+                // Create an array that will contain our promises
+                var pagesPromises = [];
+
+                for (var i = 0; i < pdf.pdfInfo.numPages; i++) {
+                    // Required to prevent that i is always the total of pages
+                    (function(pageNumber) {
+                        // Store the promise of getPageText that returns the text of a page
+                        pagesPromises.push(getPageText(pageNumber, pdfDocument));
+                    })(i + 1);
+                }
+
+                // Execute all the promises
+                Promise.all(pagesPromises).then(function(pagesText) {
+
+                    // Display text of all the pages in the console
+                    // e.g ["Text content page 1", "Text content page 2", "Text content page 3" ... ]
+                    console.log(pagesText); // representing every single page of PDF Document by array indexing
+                    console.log(pagesText.length);
+                    var outputStr = "";
+                    for (var pageNum = 0; pageNum < pagesText.length; pageNum++) {
+                        console.log(pagesText[pageNum]);
+                        outputStr = "";
+                        outputStr = "<br/><br/>Page " + (pageNum + 1) + " contents <br/> <br/>";
+
+                        var div = document.getElementById('text');
+
+                        div.innerHTML += (outputStr + pagesText[pageNum]);
+
+                    }
+
+                });
+
+            }, function(reason) {
+                // PDF loading error
+                console.error(reason);
+            });
+        }
+    </script>
+
+
+
 
 </body>
 
